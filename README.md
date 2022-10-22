@@ -9,7 +9,8 @@ sending messages for many people with to their numbers from whatsapp account tha
 
 ### Prepare ✍🏼
 Just add the excel file in the same folder of the release file 
-and you need to name the excel sheet by (ayman_data.xlxs)
+and you need to name the excel sheet by (ayman_data.xlxs) 
+- python main.py
 
 ### PS 🗒
 Make sure that you are connected to a stable internet and you will use it the best way
