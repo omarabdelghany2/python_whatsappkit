@@ -1,3 +1,4 @@
+
 import time
 import webbrowser as web
 from datetime import datetime
@@ -32,7 +33,7 @@ def sendwhatmsg_instantly(
 
     web.open(f"https://web.whatsapp.com/send?phone={phone_no}&text={quote(message)}",new=0)
     time.sleep(4)
-    pg.click(core.WIDTH / 2, core.HEIGHT / 2)
+    # pg.click(core.WIDTH / 2, core.HEIGHT / 2)
     time.sleep(wait_time - 4)
     core.findtextbox()
     pg.press("enter")
