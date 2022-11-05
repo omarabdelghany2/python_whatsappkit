@@ -66,7 +66,7 @@ class MainWindow():
         enable_engine()
 
         try:
-            book = load_workbook(f"{self.sheetNameInput.get()}.xlsx")
+            book = load_workbook(f"./data/{self.sheetNameInput.get()}.xlsx")
         except:
             self.sheetErrorLabel.config(text="didn't found the excel sheet",foreground="red")
             self.startButton.config(state="normal")
