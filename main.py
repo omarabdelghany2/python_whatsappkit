@@ -5,15 +5,6 @@ from openpyxl import load_workbook
 import threading
 from datetime import date,datetime
 
-ENGINE = False
-
-def enable_engine():
-    global ENGINE
-    ENGINE = True
-
-def disable_engine():
-    global ENGINE
-    ENGINE = False
 
 class MainApplication:
     def __init__(self, master):
@@ -40,6 +31,7 @@ class MainApplication:
 
 class MainWindow():
     def __init__(self,root,msgSystem):
+        self.ENGINE = False
         # SEND FRAME WIDGETS -----------------------------------------------------
         self.sheetNameLabel = ttk.Label(root, text="Enter the sheet name :")
         self.sheetNumberLabel = ttk.Label(root, text="Choose the sheet number :")
@@ -59,11 +51,17 @@ class MainWindow():
         self.startButton.place(x=250, y=170)
 
         self.msgSystem = msgSystem
+    
+    def enable_engine(self):
+        self.ENGINE = True
+
+    def disable_engine(self):
+        self.ENGINE = False
 
     def sendFunction(self):
         self.startButton.config(state="disabled")
         self.sheetErrorLabel.config(text="")
-        enable_engine()
+        self.enable_engine()
 
         try:
             book = load_workbook(f"./data/{self.sheetNameInput.get()}.xlsx")
@@ -77,7 +75,7 @@ class MainWindow():
         headers=[cell.value for cell in next (rows)]
         self.loadingBar.start()
         for row in rows:
-            while(ENGINE) :
+            while(self.ENGINE) :
                 try :
                     mobile_num=row[2].value
                     name=row[1].value
@@ -89,20 +87,17 @@ class MainWindow():
                 except:
                     self.sheetErrorLabel.config(text="trying again!",foreground="red")
 
-        disable_engine()
+        self.disable_engine()
         self.startButton.config(state="normal")
         self.loadingBar.place_forget()
         self.sheetErrorLabel.config(text="Finshed!",foreground="green")
-
 
     def send(self):
         thread = threading.Thread(target=self.sendFunction)
         thread.start()
        
-
     def exit(self):
-        global ENGINE
-        ENGINE = False
+        self.ENGINE = False
         self.sheetErrorLabel.config(text="")
 
 
