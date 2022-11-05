@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from whats import sendwhatmsg
+from functions.whats import sendwhatmsg
 from openpyxl import load_workbook
 import threading
 from datetime import date,datetime
