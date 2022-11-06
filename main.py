@@ -157,7 +157,7 @@ def main():
     root.geometry("500x250")
     root.resizable(height=False,width=False)
     root.title('Whatsappkit')
-    root.iconbitmap('./assets/whatsapp.ico')
+    root.iconbitmap('./assets/new-whatsapp.ico')
     root.tk.call("source","theme/forest-dark.tcl")
     ttk.Style().theme_use("forest-dark")
     MainApplication(root)
