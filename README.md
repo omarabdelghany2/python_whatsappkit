@@ -11,6 +11,8 @@ automating sending messages for many people to their numbers from whatsapp web t
 - add excelsheet to data folder
 - pipenv run python main.py
 
+![program](./docs/imgs/program.png "Whatsappkit")
+
 ### PS 🗒
 Make sure that you are connected to a stable internet and you will use it the best way
 

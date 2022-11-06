@@ -4,6 +4,7 @@ from functions.whats import sendwhatmsg
 from openpyxl import load_workbook
 import threading
 from datetime import date,datetime
+import os
 
 
 class MainApplication:
@@ -11,9 +12,9 @@ class MainApplication:
         self.master = master
         
         self.tab_parent = ttk.Notebook(self.master)
-        self.sendFrame = Frame(self.tab_parent)
-        self.outputFrame = Frame(self.tab_parent)
-        self.creditsFrame = Frame(self.tab_parent)
+        self.sendFrame = ttk.Frame(self.tab_parent)
+        self.outputFrame = ttk.Frame(self.tab_parent)
+        self.creditsFrame = ttk.Frame(self.tab_parent)
         
         self.tab_parent.pack(fill="both",expand=1)
         self.tab_parent.add(self.sendFrame,text="send")
@@ -33,19 +34,22 @@ class MainWindow():
     def __init__(self,root,msgSystem):
         self.ENGINE = False
         # SEND FRAME WIDGETS -----------------------------------------------------
-        self.sheetNameLabel = ttk.Label(root, text="Enter the sheet name :")
-        self.sheetNumberLabel = ttk.Label(root, text="Choose the sheet number :")
+        self.sheetNameLabel = ttk.Label(root, text="Select the sheet file :")
+        self.sheetNumberLabel = ttk.Label(root, text="Enter the exam number :")
         self.sheetErrorLabel = ttk.Label(root, text="",foreground="red", justify=CENTER)
-        self.sheetNameInput = ttk.Entry(root, width=35)
+        # self.sheetNameInput = ttk.Entry(root, width=35)
+        self.sheetFilePicker = StringVar(root)
+        self.sheetNameInput = ttk.OptionMenu(root,self.sheetFilePicker,"please pick file",*self.getExcelFilesFunction())
         self.sheetNumberInput = ttk.Entry(root, width=35)
         self.cancelButton = ttk.Button(root, text="Cancel",command=self.exit,style="Accent.TButton")
         self.startButton = ttk.Button(root, text="Start",command=self.send,style="Accent.TButton")
-        self.loadingBar = ttk.Progressbar(root, orient="horizontal",mode="determinate",length=195)
+        self.loadingBar = ttk.Progressbar(root, orient="horizontal",mode="indeterminate",length=195)
         # SEND FRAME WIDGETS POSTIONS -----------------------------------------------------
         self.sheetNameLabel.place(x=20, y=55)
         self.sheetNumberLabel.place(x=20, y=105)
         self.sheetErrorLabel.pack()
         self.sheetNameInput.place(x=200, y=50)
+        self.sheetNameInput.config(width=32)
         self.sheetNumberInput.place(x=200, y=100)
         self.cancelButton.place(x=150, y=170)
         self.startButton.place(x=250, y=170)
@@ -62,9 +66,8 @@ class MainWindow():
         self.startButton.config(state="disabled")
         self.sheetErrorLabel.config(text="")
         self.enable_engine()
-
         try:
-            book = load_workbook(f"./data/{self.sheetNameInput.get()}.xlsx")
+            book = load_workbook(f"./data/{self.sheetFilePicker.get()}")
         except:
             self.sheetErrorLabel.config(text="didn't found the excel sheet",foreground="red")
             self.startButton.config(state="normal")
@@ -74,23 +77,33 @@ class MainWindow():
         rows = sheet.rows
         headers=[cell.value for cell in next (rows)]
         self.loadingBar.start()
-        for row in rows:
-            while(self.ENGINE) :
+        while(self.ENGINE):
+            for row in rows:
                 try :
                     mobile_num=row[2].value
                     name=row[1].value
                     grade=row[3].value
-                    sendwhatmsg("+20"+str(mobile_num), str(grade)+str(name)+" درجةالطالب " ,16,59)
+                    sendwhatmsg(
+                        f"+20{mobile_num}",self.msgTemplateFunction(name,grade),16,59
+                    )
                     self.sheetErrorLabel.config(text="successful sent!",foreground="green")
                     self.msgSystem(name,grade,mobile_num)
                     break
                 except:
                     self.sheetErrorLabel.config(text="trying again!",foreground="red")
-
         self.disable_engine()
         self.startButton.config(state="normal")
         self.loadingBar.place_forget()
         self.sheetErrorLabel.config(text="Finshed!",foreground="green")
+
+    def msgTemplateFunction(self,name,grade):
+        return f"الطالب : {name} -- الدرجة : {grade}"
+
+    def getExcelFilesFunction(self):
+        files = os.listdir("./data")
+        func = lambda itm : ".xlsx" in itm
+        result = list(filter(func,files))
+        return result
 
     def send(self):
         thread = threading.Thread(target=self.sendFunction)
@@ -99,6 +112,7 @@ class MainWindow():
     def exit(self):
         self.ENGINE = False
         self.sheetErrorLabel.config(text="")
+        self.loadingBar.config()
 
 
 class OutputWindow():
@@ -118,7 +132,7 @@ class OutputWindow():
         Date: {date.today()}
         Time: {datetime.now().strftime("%H:%M:%S")}
         Phone: {mobile}
-        Message: {grade} {name} درجةالطالب 
+        Message: {grade} {name} درجة الطالب 
         -------------------------------------------
         """
         return loggerMsg
@@ -144,8 +158,8 @@ def main():
     root.resizable(height=False,width=False)
     root.title('Whatsapp Toolkit')
     root.iconbitmap('./assets/whatsapp.ico')
-    root.tk.call("source","azure.tcl")
-    root.tk.call("set_theme","dark")
+    root.tk.call("source","theme/forest-dark.tcl")
+    ttk.Style().theme_use("forest-dark")
     MainApplication(root)
     root.mainloop()
 
