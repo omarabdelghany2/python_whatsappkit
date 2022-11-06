@@ -30,13 +30,14 @@ class MainApplication:
         self.output_window.insertLog(msg)
 
 
-class MainWindow():
+class MainWindow:
     def __init__(self,root,msgSystem):
         self.ENGINE = False
         # SEND FRAME WIDGETS -----------------------------------------------------
         self.sheetNameLabel = ttk.Label(root, text="Select the sheet file :")
         self.sheetNumberLabel = ttk.Label(root, text="Enter the exam number :")
         self.sheetErrorLabel = ttk.Label(root, text="",foreground="red", justify=CENTER)
+        self.sheetIndicatior = ttk.Label(root, text="")
         # self.sheetNameInput = ttk.Entry(root, width=35)
         self.sheetFilePicker = StringVar(root)
         self.sheetNameInput = ttk.OptionMenu(root,self.sheetFilePicker,"please pick file",*self.getExcelFilesFunction())
@@ -47,6 +48,7 @@ class MainWindow():
         # SEND FRAME WIDGETS POSTIONS -----------------------------------------------------
         self.sheetNameLabel.place(x=20, y=55)
         self.sheetNumberLabel.place(x=20, y=105)
+        self.sheetIndicatior.place(x=450, y=5)
         self.sheetErrorLabel.pack()
         self.sheetNameInput.place(x=200, y=50)
         self.sheetNameInput.config(width=32)
@@ -75,19 +77,23 @@ class MainWindow():
         self.loadingBar.place(x=150,y=210)
         sheet = book.active
         rows = sheet.rows
-        headers=[cell.value for cell in next (rows)]
+        headers = [cell.value for cell in next (rows)]
+        total = sheet.max_row
+        count = 0
         self.loadingBar.start()
         while(self.ENGINE):
             for row in rows:
                 try :
-                    mobile_num=row[2].value
+                    self.sheetIndicatior.config(text=f"{count}/{total}")
                     name=row[1].value
+                    mobile=row[2].value
                     grade=row[3].value
                     sendwhatmsg(
-                        f"+20{mobile_num}",self.msgTemplateFunction(name,grade),16,59
+                        f"+20{mobile}",self.msgTemplateFunction(name,grade),16,59
                     )
                     self.sheetErrorLabel.config(text="successful sent!",foreground="green")
-                    self.msgSystem(name,grade,mobile_num)
+                    self.msgSystem(name,grade,mobile)
+                    count += 1
                     break
                 except:
                     self.sheetErrorLabel.config(text="trying again!",foreground="red")
@@ -115,7 +121,7 @@ class MainWindow():
         self.loadingBar.config()
 
 
-class OutputWindow():
+class OutputWindow:
     def __init__(self,root):
         # OUTPUT FRAME WIDGETS -----------------------------------------------------
         self.loggerText = Text(root,state=DISABLED)
@@ -138,7 +144,7 @@ class OutputWindow():
         return loggerMsg
 
 
-class CreditWindow():
+class CreditWindow:
     def __init__(self,root):
         # CREDITS FRAME WIDGETS -----------------------------------------------------
         spaceLabel = ttk.Label(root, text="",padding=15)
