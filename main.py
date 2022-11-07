@@ -79,12 +79,12 @@ class MainWindow:
         rows = sheet.rows
         headers = [cell.value for cell in next (rows)]
         total = sheet.max_row
-        count = 0
+        count = 1
         self.loadingBar.start()
         while(self.ENGINE):
             for row in rows:
+                self.sheetIndicatior.config(text=f"{count}/{total}")
                 try :
-                    self.sheetIndicatior.config(text=f"{count}/{total}")
                     name=row[1].value
                     mobile=row[2].value
                     grade=row[3].value
